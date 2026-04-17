@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VigilIT - AI-Powered Infrastructure Monitoring</title>
+    <style>
+        :root {
+            --primary: #00D4AA;
+            --primary-dark: #00B894;
+            --bg-dark: #0B1221;
+            --bg-card: #111D33;
+            --bg-card-hover: #162440;
+            --text: #E2E8F0;
+            --text-muted: #8892A8;
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-red: #EF4444;
+            --accent-amber: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated grid background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 170, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--primary);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--bg-dark);
+            padding: 0.9rem 2rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 2px solid var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            padding: 0.9rem 2rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255,255,255,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Terminal animation */
+        .terminal {
+            max-width: 800px;
+            margin: 3rem auto 0;
+            background: #0D1520;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #EF4444; }
+        .terminal-dot.yellow { background: #F59E0B; }
+        .terminal-dot.green { background: #22C55E; }
+
+        .terminal-body {
+            padding: 1.25rem;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            min-height: 260px;
+        }
+
+        .terminal-line {
+            opacity: 0;
+            animation: typeLine 0.3s ease forwards;
+        }
+
+        .terminal-line .prompt { color: var(--primary); }
+        .terminal-line .time { color: var(--text-muted); }
+        .terminal-line .severity-critical { color: var(--accent-red); font-weight: 700; }
+        .terminal-line .severity-info { color: var(--accent-blue); }
+        .terminal-line .success { color: var(--primary); }
+        .terminal-line .warn { color: var(--accent-amber); }
+
+        .terminal-line:nth-child(1) { animation-delay: 0.5s; }
+        .terminal-line:nth-child(2) { animation-delay: 1.2s; }
+        .terminal-line:nth-child(3) { animation-delay: 1.9s; }
+        .terminal-line:nth-child(4) { animation-delay: 2.6s; }
+        .terminal-line:nth-child(5) { animation-delay: 3.3s; }
+        .terminal-line:nth-child(6) { animation-delay: 4.0s; }
+        .terminal-line:nth-child(7) { animation-delay: 4.7s; }
+        .terminal-line:nth-child(8) { animation-delay: 5.4s; }
+
+        @keyframes typeLine {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Problem / Solution */
+        .problem-section {
+            padding: 6rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .problem-section h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .problem-section .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .comparison-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .comparison-card.old {
+            border-top: 3px solid var(--accent-red);
+        }
+
+        .comparison-card.new {
+            border-top: 3px solid var(--primary);
+        }
+
+        .comparison-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comparison-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .comparison-card ul li {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .comparison-card.old ul li::before {
+            content: "\2717";
+            position: absolute;
+            left: 0;
+            color: var(--accent-red);
+            font-weight: 700;
+        }
+
+        .comparison-card.new ul li::before {
+            content: "\2713";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Features */
+        .features {
+            padding: 4rem 2rem 6rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 3rem;
+            font-weight: 800;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            border-color: rgba(0, 212, 170, 0.2);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-icon.green { background: rgba(0, 212, 170, 0.15); }
+        .feature-icon.blue { background: rgba(59, 130, 246, 0.15); }
+        .feature-icon.purple { background: rgba(139, 92, 246, 0.15); }
+        .feature-icon.amber { background: rgba(245, 158, 11, 0.15); }
+        .feature-icon.red { background: rgba(239, 68, 68, 0.15); }
+        .feature-icon.cyan { background: rgba(6, 182, 212, 0.15); }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* How it works */
+        .how-it-works {
+            padding: 4rem 2rem 6rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 3rem;
+            font-weight: 800;
+        }
+
+        .step {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 212, 170, 0.15);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .step-content h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .step-connector {
+            width: 2px;
+            height: 24px;
+            background: rgba(0, 212, 170, 0.2);
+            margin-left: 23px;
+            margin-bottom: 0;
+        }
+
+        /* Security callout */
+        .security {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .security-card {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.05), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .security-card .shield {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .security-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .security-card p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .security-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .security-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Beta signup */
+        .beta-signup {
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .beta-signup h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .beta-signup p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .signup-form {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .signup-form input[type="email"] {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.9rem 1.25rem;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .signup-form input[type="email"]:focus {
+            border-color: var(--primary);
+        }
+
+        .signup-form button {
+            padding: 0.9rem 2rem;
+            background: var(--primary);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .signup-form button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);
+        }
+
+        .signup-note {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1.05rem; }
+            .comparison { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: 1fr; }
+            .step { gap: 1.25rem; }
+            .security-features { flex-direction: column; align-items: center; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 1.8rem; }
+            .terminal-body { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<div class="content-wrapper">
+
+    <!-- Nav -->
+    <nav>
+        <div class="logo-container">
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer ring -->
+                <circle cx="50" cy="50" r="46" stroke="#00D4AA" stroke-width="3" fill="none" opacity="0.3"/>
+                <!-- Eye shape -->
+                <path d="M10 50 Q50 15 90 50 Q50 85 10 50Z" stroke="#00D4AA" stroke-width="3" fill="rgba(0,212,170,0.05)"/>
+                <!-- Iris -->
+                <circle cx="50" cy="50" r="16" fill="none" stroke="#00D4AA" stroke-width="3"/>
+                <!-- Pupil -->
+                <circle cx="50" cy="50" r="7" fill="#00D4AA"/>
+                <!-- Pulse line through eye -->
+                <path d="M10 50 L35 50 L42 35 L50 65 L58 35 L65 50 L90 50" stroke="#00D4AA" stroke-width="2.5" fill="none" opacity="0.6"/>
+                <!-- Scanning rays -->
+                <line x1="50" y1="4" x2="50" y2="18" stroke="#00D4AA" stroke-width="2" opacity="0.4"/>
+                <line x1="50" y1="82" x2="50" y2="96" stroke="#00D4AA" stroke-width="2" opacity="0.4"/>
+            </svg>
+            <div class="logo-text">Vigil<span>IT</span></div>
+        </div>
+        <a href="#beta">Request Beta Access</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="badge">PRIVATE BETA - NOW ACCEPTING APPLICATIONS</div>
+        <h1>Your Infrastructure<br><span class="highlight">Never Sleeps. Neither Do We.</span></h1>
+        <p>VigilIT is an AI-powered SRE agent that continuously monitors your infrastructure, learns what matters to your team, and investigates incidents before they become outages. Fully self-hosted. Your data never leaves your network.</p>
+        <div class="cta-group">
+            <a href="#beta" class="btn-primary">Join the Beta</a>
+            <a href="#how" class="btn-secondary">See How It Works</a>
+        </div>
+
+        <!-- Animated terminal -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+            </div>
+            <div class="terminal-body">
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:01]</span> Heartbeat #4,721 &mdash; polling 14 sources...</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:03]</span> <span class="severity-critical">ANOMALY</span> api-gateway p99 latency 120ms &rarr; 2,400ms</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:04]</span> <span class="severity-info">TRIAGE</span> Correlating with 3 related signals...</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:06]</span> <span class="severity-info">INVESTIGATE</span> Checking recent deploys, dependencies, logs...</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:11]</span> <span class="warn">ROOT CAUSE</span> payments-db connection pool exhausted (100/100)</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:12]</span> <span class="severity-info">EVIDENCE</span> 247 timeout errors in payments-service logs since 14:27</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:13]</span> <span class="success">ESCALATE</span> Incident created &rarr; #payments-oncall with fix suggestion</div>
+                <div class="terminal-line"><span class="prompt">vigilit</span> <span class="time">[14:32:13]</span> <span class="success">&#10003;</span> Full investigation in <span class="success">12 seconds</span>. Resuming heartbeat...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem vs Solution -->
+    <section class="problem-section">
+        <h2>Monitoring Shouldn't Mean Babysitting</h2>
+        <p class="subtitle">Traditional monitoring tells you something broke. VigilIT tells you why, what to do, and catches the problems you haven't thought to look for yet.</p>
+        <div class="comparison">
+            <div class="comparison-card old">
+                <h3>Traditional Monitoring</h3>
+                <ul>
+                    <li>Static thresholds that never learn</li>
+                    <li>Alert fatigue &mdash; hundreds of noisy notifications</li>
+                    <li>Manual investigation every single time</li>
+                    <li>Tribal knowledge walks out the door with people</li>
+                    <li>Only catches what you thought to set a rule for</li>
+                    <li>Sends your data to third-party cloud services</li>
+                </ul>
+            </div>
+            <div class="comparison-card new">
+                <h3>VigilIT</h3>
+                <ul>
+                    <li>Learns what "normal" looks like for your system</li>
+                    <li>Smart triage &mdash; only escalates what matters</li>
+                    <li>Automated first-response investigation in seconds</li>
+                    <li>Institutional knowledge that grows over time</li>
+                    <li>Proactively spots trends and hidden correlations</li>
+                    <li>100% self-hosted &mdash; data never leaves your network</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <h2>Built for Teams Who Take Uptime Seriously</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon green">&#x1F4C8;</div>
+                <h3>Continuous Heartbeat</h3>
+                <p>Polls your infrastructure on a configurable cadence &mdash; Prometheus, Kubernetes, ELK, Grafana, cloud APIs, and custom endpoints. Always watching.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon blue">&#x1F9E0;</div>
+                <h3>AI-Powered Investigation</h3>
+                <p>When something looks wrong, the agent pulls logs, checks recent deploys, walks the dependency graph, and builds a root cause hypothesis with evidence.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon purple">&#x1F504;</div>
+                <h3>Learns From Feedback</h3>
+                <p>Was the alert useful? Was the diagnosis right? VigilIT learns from every interaction and gets more accurate for your specific environment over time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon amber">&#x1F50D;</div>
+                <h3>Proactive Trend Detection</h3>
+                <p>Spots slow-moving problems humans miss &mdash; disk filling up over weeks, latency creeping up, intermittent failures getting more frequent.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon red">&#x26A1;</div>
+                <h3>Intelligent Escalation</h3>
+                <p>Routes to the right team with the right severity. Includes full investigation context, evidence chain, and suggested remediation steps.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon cyan">&#x1F512;</div>
+                <h3>Fully Self-Hosted</h3>
+                <p>Runs entirely on your infrastructure with local AI models. Zero data sent to external services. Air-gapped deployment supported.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how">
+        <h2>How VigilIT Works</h2>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Connect Your Stack</h3>
+                <p>Point VigilIT at your existing monitoring tools &mdash; Prometheus, Grafana, Elasticsearch, Kubernetes, cloud providers. No agents to install, no data migration. Works with what you already have.</p>
+            </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>The Heartbeat Starts</h3>
+                <p>VigilIT begins polling your infrastructure on a regular cadence. It builds a baseline of what "normal" looks like &mdash; traffic patterns, error rates, latency profiles, resource usage.</p>
+            </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Detect &amp; Investigate</h3>
+                <p>When the agent spots an anomaly, it automatically triages and investigates &mdash; checking logs, recent changes, dependencies, and past incidents to build a root cause hypothesis backed by evidence.</p>
+            </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Escalate With Context</h3>
+                <p>The right team gets notified with a full incident summary, evidence chain, and suggested fix. No more "CPU is high" alerts with zero context.</p>
+            </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Learn &amp; Improve</h3>
+                <p>After every incident, VigilIT learns from your feedback and your team's actions. False positive? It won't make that mistake again. Good catch? It'll look for similar patterns proactively.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security -->
+    <section class="security">
+        <div class="security-card">
+            <div class="shield">&#x1F6E1;</div>
+            <h2>Your Data. Your Network. Period.</h2>
+            <p>VigilIT runs entirely on your infrastructure using local AI models. No cloud LLM APIs, no telemetry phone-home, no data exfiltration risk. Built for organizations where security isn't optional.</p>
+            <div class="security-features">
+                <div class="security-feature">&#x2713; On-premises AI inference</div>
+                <div class="security-feature">&#x2713; Air-gapped deployment</div>
+                <div class="security-feature">&#x2713; Zero third-party data sharing</div>
+                <div class="security-feature">&#x2713; Encrypted at rest &amp; in transit</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beta Signup -->
+    <section class="beta-signup" id="beta">
+        <h2>Get Early Access</h2>
+        <p>We're accepting a limited number of teams for our private beta. Get in early and help shape the product.</p>
+        <form class="signup-form" action="https://formspree.io/f/PLACEHOLDER" method="POST">
+            <input type="email" name="email" placeholder="you@company.com" required>
+            <button type="submit">Request Access</button>
+        </form>
+        <p class="signup-note">No spam. We'll reach out when your spot is ready.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 VigilIT. Built by <a href="https://github.com/strattegys">Strattegys</a>.</p>
+    </footer>
+
+</div>
+
+</body>
+</html>
