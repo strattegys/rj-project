@@ -951,10 +951,11 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
-            .hero-inner { grid-template-columns: 1fr; text-align: center; }
+            .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
             .hero-content { max-width: 640px; margin: 0 auto; }
+            .hero-sub { margin-left: auto; margin-right: auto; }
             .hero-ctas { justify-content: center; }
-            .hero-demo { max-width: 680px; margin: 2rem auto 0; }
+            .hero-demo { max-width: 680px; margin: 0 auto; }
         }
 
         @media (max-width: 900px) {
@@ -969,11 +970,18 @@
             nav { padding: 0 1.25rem; }
             .nav-links a:not(.nav-cta) { display: none; }
             .hero { padding: 2.5rem 1.25rem; }
-            .hero h1 { font-size: 1.75rem; letter-spacing: -0.75px; }
-            .hero-sub { font-size: 1rem; }
+            .hero-inner { gap: 1.5rem; }
+            .hero h1 { font-size: 1.6rem; letter-spacing: -0.5px; }
+            .hero-sub { font-size: 0.9rem; line-height: 1.6; }
+            .hero-badge { font-size: 0.65rem; padding: 0.3rem 0.75rem; margin-bottom: 1.25rem; }
+            .hero-ctas { flex-direction: column; align-items: center; gap: 0.5rem; }
+            .hero-ctas .btn { width: 100%; text-align: center; justify-content: center; font-size: 0.9rem; padding: 0.7rem 1.25rem; }
             .hero-demo { max-width: 100%; }
             .demo-window { border-radius: 8px; }
-            .demo-body { font-size: 0.55rem; line-height: 1.7; padding: 1rem; overflow-x: auto; }
+            .demo-titlebar { padding: 8px 12px; gap: 6px; }
+            .demo-titlebar-text { font-size: 0.6rem; }
+            .demo-dot { width: 8px; height: 8px; }
+            .demo-body { font-size: 0.5rem; line-height: 1.7; padding: 0.75rem; overflow-x: auto; }
             .demo-line { white-space: nowrap; }
             .demo-titlebar-text { font-size: 0.6rem; }
             .proof-inner { gap: 1.5rem; }
